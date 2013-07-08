@@ -288,7 +288,7 @@ void MainWindow::genereASS(const Media &media) const
   args << media.getPath();
   ss << media.getFps();
   args << QString::fromStdString(ss.str());
-  p->execute("tool/toy2ass",args);
+  p->execute("toy2ass",args);
   delete p;
 }
 
