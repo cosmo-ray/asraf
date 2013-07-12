@@ -22,6 +22,7 @@ QString  getPlayerCmd();
 template<>
 QString  getPlayerCmd<VLC>();
 
+long int pRand();
 void	 initRand();
 
 const	QString durationToString(int64_t duration);

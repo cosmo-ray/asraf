@@ -25,12 +25,21 @@ QString  getPlayerCmd<MPLAYER>()
 #endif
 }
 
+long int pRand()
+{
+#ifdef	Q_OS_WIN32
+  return (rand());
+#else
+  return (random());
+#endif  
+}
+
 void	initRand()
 {
 #ifdef	Q_OS_WIN32
   srand(153);
 #else
-  srand(time(0));
+  srandom(time(0));
 #endif
 }
  

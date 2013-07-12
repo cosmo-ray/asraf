@@ -517,7 +517,7 @@ void MainWindow::start(void)
 	  listsKara += "\"";
           listsKara += _eyecatchDirectory;
           listsKara += SLASH;
-          listsKara += _eyecatchList[rand() % len];
+          listsKara += _eyecatchList[pRand() % len];
           listsKara += "\"";
           listsKara += _playerOpt;
         }
@@ -527,7 +527,7 @@ void MainWindow::start(void)
           endlist += "\"";
           endlist += _eyecatchDirectory.replace('/', SLASH);
           endlist += SLASH;
-          endlist += _eyecatchList[rand() % len];
+          endlist += _eyecatchList[pRand() % len];
           endlist += "\"";
           endlist += _playerOpt;
         }
@@ -558,8 +558,8 @@ void MainWindow::shufle(void)
 
   while (i < (len * 2))
     {
-      tmp = _karaList.takeItem(rand() % len);
-      _karaList.insertItem(rand() % (len - 1), tmp);
+      tmp = _karaList.takeItem(pRand() % len);
+      _karaList.insertItem(pRand() % (len - 1), tmp);
       ++i;
     }
 }
@@ -570,7 +570,7 @@ void MainWindow::pick(void)
   int	karaListLen = _karaList.count();
   if ((len - karaListLen) <= 0)
     return;
-  while (!addToPlaylist(static_cast<Media *>(_FilesList.topLevelItem(rand() % len))));
+  while (!addToPlaylist(static_cast<Media *>(_FilesList.topLevelItem(pRand() % len))));
 }
 
 void MainWindow::clearPlaylist(void)
