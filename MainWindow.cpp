@@ -479,7 +479,8 @@ void  MainWindow::changePlayer(int i)
       	{
       	  _playerOpt = " -fs";
       	}
-      _playerOpt += " -ass -framedrop -autosync 30 -mc 2.0 ";
+      _playerOpt += " -ass ";
+      //_playerOpt += " -ass -framedrop -autosync 30 -mc 2.0 ";
       _player = getPlayerCmd();
     }
   else
