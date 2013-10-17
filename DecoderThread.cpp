@@ -31,8 +31,8 @@ void DecoderThread::run()
 	  static_cast<Media *>(nitem)->setDuration(pFormatCtx->duration / AV_TIME_BASE);
 	  static_cast<Media *>(nitem)->setFps((float)pFormatCtx->streams[0]->r_frame_rate.num /
 					      (float)pFormatCtx->streams[0]->r_frame_rate.den);
-	  std::cout << static_cast<Media *>(nitem)->getFps() << std::endl;
-	  std::cout << pFormatCtx->streams[0]->r_frame_rate.den << std::endl;
+	  // std::cout << static_cast<Media *>(nitem)->getFps() << std::endl;
+	  // std::cout << pFormatCtx->streams[0]->r_frame_rate.den << std::endl;
 
 	  nitem->setText(1, durationToString(static_cast<Media *>(nitem)->getDuration()));
 	  avformat_close_input (&pFormatCtx);
