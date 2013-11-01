@@ -306,7 +306,7 @@ MainWindow::Conf  MainWindow::getConfTabIdx(const QString &str)
 
 void	MainWindow::loadConfig()
 {
-  QFile f("asraf.conf");
+  QFile f(QString(std::getenv("HOME")) + "/.asraf.conf");
   f.open(QIODevice::ReadOnly | QIODevice::Text);
   QTextStream in(&f);
   QString line;
@@ -347,7 +347,7 @@ void	MainWindow::loadConfig()
 
 void	MainWindow::saveConfig()
 {
-  QFile f("asraf.conf");
+  QFile f(QString(std::getenv("HOME")) + "/.asraf.conf");
   f.open(QIODevice::WriteOnly);
   QTextStream out(&f);
   // store data in f

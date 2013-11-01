@@ -12,8 +12,10 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = asraf
 TEMPLATE = app
 
-QMAKE_CXXFLAGS += -std=c++11 -O2
+target.path = /usr/bin/
+INSTALLS += target
 
+QMAKE_CXXFLAGS += -std=c++11 -O2
 
 #QMAKE_LFLAGS += -static-libgcc
 win32: LIBS +=  -L$$PWD/lib/ -lavdevice -lavformat -lavcodec -lavutil -lswscale
