@@ -103,3 +103,30 @@ QString changeExtansion(const QString &path, const char *ext)
     }
   return (ret);
 }
+
+void goToCurrentDirectory()
+{
+#ifdef Q_OS_WIN32
+#else
+  QString dir = QString(std::getenv("HOME")) + "/.asraf";
+  if (!QDir(dir).exists())
+    {
+      std::cerr << dir.toLocal8Bit().constData() << " NOT FOUND, creating it" << std::endl;
+      QDir().mkdir(dir);
+      goToCurrentDirectory();
+    }
+  else
+    {
+      QDir::setCurrent(dir);
+    }
+#endif
+}
+
+QString getResourcesLocation()
+{
+#ifdef Q_OS_WIN32
+  return ("resources/");
+#else
+  return ("/opt/asraf/");
+#endif
+}

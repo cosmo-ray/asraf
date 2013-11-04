@@ -18,7 +18,7 @@ Media::Media(const Media &other)
 Media::Media(const QString &dirPath, const QString &name)
   : QListWidgetItem(QFileInfo(name).completeBaseName()), _path(dirPath + name), _duration(-1), _fps(0)
 {
-  std::cout << _path.toLocal8Bit().constData() << std::endl;
+  //std::cout << _path.toLocal8Bit().constData() << std::endl;
 }
 
 Media::Media(const QString &path)

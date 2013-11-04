@@ -42,9 +42,11 @@ MainWindow::MainWindow() : _vbox(this),
   QDesktopWidget *desktop = QApplication::desktop();
 
   initRand();
+  goToCurrentDirectory();
   resize(desktop->width(), desktop->height());
   setWindowTitle("Asamiya Saki will rape all your familly");
-  setWindowIcon(QIcon("resources/sukeban_deka_icone.jpg"));
+  std::cout << QString(getResourcesLocation() + "sukeban_deka_icone.jpg").toLocal8Bit().constData() << std::endl;
+  setWindowIcon(QIcon(getResourcesLocation() + "sukeban_deka_icone.jpg"));
   setWindowFlags(Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint | Qt::WindowMinimizeButtonHint);
  
   _FilesList.setColumnCount(3);
@@ -169,7 +171,7 @@ void	MainWindow::loadPlaylist()
   QTextStream in(&f);
   Media* nitem;
   QString line;
-  std::cout << filename.toUtf8().constData();
+  //std::cout << filename.toUtf8().constData();
   // load data in f
   while (!in.atEnd()) {
     line = in.readLine();
@@ -179,9 +181,9 @@ void	MainWindow::loadPlaylist()
     if (!avformat_open_input(&pFormatCtx, static_cast<Media *>(nitem)->getPath().toLocal8Bit().constData(), NULL, NULL))
       {
 	avformat_find_stream_info(pFormatCtx, NULL);
-	  static_cast<Media *>(nitem)->setDuration(pFormatCtx->duration / AV_TIME_BASE);
-	  static_cast<Media *>(nitem)->setFps((float)pFormatCtx->streams[0]->r_frame_rate.num /
-					      (float)pFormatCtx->streams[0]->r_frame_rate.den);
+	static_cast<Media *>(nitem)->setDuration(pFormatCtx->duration / AV_TIME_BASE);
+	static_cast<Media *>(nitem)->setFps((float)pFormatCtx->streams[0]->r_frame_rate.num /
+					    (float)pFormatCtx->streams[0]->r_frame_rate.den);
       }
       avformat_free_context(pFormatCtx);
       ////////////// end of copypaste
@@ -306,7 +308,7 @@ MainWindow::Conf  MainWindow::getConfTabIdx(const QString &str)
 
 void	MainWindow::loadConfig()
 {
-  QFile f(QString(std::getenv("HOME")) + "/.asraf.conf");
+  QFile f("asraf.conf");
   f.open(QIODevice::ReadOnly | QIODevice::Text);
   QTextStream in(&f);
   QString line;
@@ -339,15 +341,15 @@ void	MainWindow::loadConfig()
       default:
 	break;
       }
-    std::cout << left.toLocal8Bit().constData() << std::endl;  
-    std::cout << right.toLocal8Bit().constData() << std::endl;  
+    // std::cout << left.toLocal8Bit().constData() << std::endl;  
+    // std::cout << right.toLocal8Bit().constData() << std::endl;  
   }
   f.close();
 }
 
 void	MainWindow::saveConfig()
 {
-  QFile f(QString(std::getenv("HOME")) + "/.asraf.conf");
+  QFile f("asraf.conf");
   f.open(QIODevice::WriteOnly);
   QTextStream out(&f);
   // store data in f
@@ -383,7 +385,7 @@ bool	MainWindow::addToPlaylist(QTreeWidgetItem *item)
   QString pathAss = changeExtansion(static_cast<Media*>(item)->getPath(), "ass");
   if (access(pathAss.toLocal8Bit().constData(), 0))
     {
-      std::cout << "cant find " << pathAss.toLocal8Bit().constData() << std::endl;
+      //std::cout << "cant find " << pathAss.toLocal8Bit().constData() << std::endl;
       if (!access(changeExtansion(static_cast<Media*>(item)->getPath(), "frm").toLocal8Bit().constData(), 0))
 	genereASS(*static_cast<Media*>(item));
       // try use OcamlScript

@@ -13,7 +13,10 @@ TARGET = asraf
 TEMPLATE = app
 
 target.path = /usr/bin/
+resources.path = /opt/asraf/
+resources.files = resources/*
 INSTALLS += target
+INSTALLS += resources
 
 QMAKE_CXXFLAGS += -std=c++11 -O2
 
