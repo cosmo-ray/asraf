@@ -41,19 +41,20 @@ MainWindow::MainWindow() : _vbox(this),
 {
   QDesktopWidget *desktop = QApplication::desktop();
 
-  changePlayer(MPLAYER);
   initRand();
+  goToCurrentDirectory();
   resize(desktop->width(), desktop->height());
   setWindowTitle("Asamiya Saki will rape all your familly");
-  setWindowIcon(QIcon("resources/sukeban_deka_icone.jpg"));
+  std::cout << QString(getResourcesLocation() + "sukeban_deka_icone.jpg").toLocal8Bit().constData() << std::endl;
+  setWindowIcon(QIcon(getResourcesLocation() + "sukeban_deka_icone.jpg"));
   setWindowFlags(Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint | Qt::WindowMinimizeButtonHint);
  
   _FilesList.setColumnCount(3);
   QStringList ColumnNames;
-  ColumnNames << "karaoke name" << "lenght" << "saki";
+  ColumnNames << "karaoke name" << "lenght" << "nbr";
   _FilesList.setHeaderLabels(ColumnNames);
   _FilesList.setColumnWidth( 0, 500 );
-
+  _FilesList.setRootIsDecorated(false);
 
   _splitter.addWidget(&_FilesList);
   _splitter.addWidget(&_karaListInfo);
@@ -96,8 +97,12 @@ MainWindow::MainWindow() : _vbox(this),
   _endEyecatch->setCheckable(true);
 
   _noDouble = _playMenu.addAction("no double ?");
+  _noFullScreen = _playMenu.addAction("no Full Screen ?");
   _noDouble->setCheckable(true);
-    
+  _noFullScreen->setChecked(false);
+  _noFullScreen->setCheckable(true);
+  _noFullScreen->setChecked(false);
+
   _vbox.addLayout(&_hboxOptions);
   _vbox.addLayout(&_hbox2ndOptions);
   _vbox.addWidget(&_splitter);
@@ -138,6 +143,8 @@ void	MainWindow::connector(void)
   connect(_beginEyecatch, SIGNAL(triggered()), this, SLOT(beginEyecatch(void)));
   connect(_endEyecatch, SIGNAL(triggered()), this, SLOT(endEyecatch(void)));
   connect(_noDouble, SIGNAL(triggered()), this, SLOT(noDouble(void)));
+  connect(_noFullScreen, SIGNAL(triggered()), this, SLOT(noDouble(void)));
+
 
   /*button*/
   connect(&_start, SIGNAL(clicked(bool)), this, SLOT(start(void)));
@@ -166,23 +173,23 @@ void	MainWindow::loadPlaylist()
   QTextStream in(&f);
   Media* nitem;
   QString line;
-  std::cout << filename.toUtf8().constData();
+  //std::cout << filename.toUtf8().constData();
   // load data in f
   while (!in.atEnd()) {
     line = in.readLine();
     nitem = new Media(line);
 ////////////// start of copypaste
- AVFormatContext* pFormatCtx = avformat_alloc_context();
-      if (!avformat_open_input(&pFormatCtx, static_cast<Media *>(nitem)->getPath().toLocal8Bit().constData(), NULL, NULL))
-	{
-	  avformat_find_stream_info(pFormatCtx, NULL);
-	  static_cast<Media *>(nitem)->setDuration(pFormatCtx->duration / AV_TIME_BASE);
-	  static_cast<Media *>(nitem)->setFps((float)pFormatCtx->streams[0]->r_frame_rate.num /
-					      (float)pFormatCtx->streams[0]->r_frame_rate.den);
-	}
+    AVFormatContext* pFormatCtx = avformat_alloc_context();
+    if (!avformat_open_input(&pFormatCtx, static_cast<Media *>(nitem)->getPath().toLocal8Bit().constData(), NULL, NULL))
+      {
+	avformat_find_stream_info(pFormatCtx, NULL);
+	static_cast<Media *>(nitem)->setDuration(pFormatCtx->duration / AV_TIME_BASE);
+	static_cast<Media *>(nitem)->setFps((float)pFormatCtx->streams[0]->r_frame_rate.num /
+					    (float)pFormatCtx->streams[0]->r_frame_rate.den);
+      }
       avformat_free_context(pFormatCtx);
-////////////// end of copypaste
-    addToPlaylist(static_cast<QTreeWidgetItem *>(nitem));
+      ////////////// end of copypaste
+      addToPlaylist(static_cast<QTreeWidgetItem *>(nitem));
     //newItem = new Media(static_cast<Media*>(item)->getPath());
     //String line = in.readLine();
   }
@@ -226,6 +233,7 @@ void	MainWindow::readKaraDirectory()
 
   QStringList  filesName = dir.entryList();
   QStringList::const_iterator constIterator;
+  int	i = 0;
 
   for (constIterator = filesName.constBegin(); constIterator != filesName.constEnd();
        ++constIterator)
@@ -235,8 +243,10 @@ void	MainWindow::readKaraDirectory()
 	  QTreeWidgetItem* nitem = new Media((dir.path() + SLASH), *constIterator);
 	  static_cast<Media *>(nitem)->setDuration(-1);
 	  nitem->setText(0, ((Media *)nitem)->getName());
-	  _FilesList.addTopLevelItem(nitem);
 	  nitem->setText(1, "loading");
+	  nitem->setText(2, QString::number(i + 1));
+	  _FilesList.addTopLevelItem(nitem);
+	  ++i;
 	}
     }
   _decoderThread.start();
@@ -282,7 +292,8 @@ void MainWindow::genereASS(const Media &media) const
   args << media.getPath();
   ss << media.getFps();
   args << QString::fromStdString(ss.str());
-  p->execute("tool/toy2ass",args);
+  p->execute("toy2ass",args);
+  delete p;
 }
 
 MainWindow::Conf  MainWindow::getConfTabIdx(const QString &str)
@@ -334,8 +345,8 @@ void	MainWindow::loadConfig()
       default:
 	break;
       }
-    std::cout << left.toLocal8Bit().constData() << std::endl;  
-    std::cout << right.toLocal8Bit().constData() << std::endl;  
+    // std::cout << left.toLocal8Bit().constData() << std::endl;  
+    // std::cout << right.toLocal8Bit().constData() << std::endl;  
   }
   f.close();
 }
@@ -372,13 +383,13 @@ void	MainWindow::saveConfig()
 
 /*Files list slots*/
 
-void	MainWindow::addToPlaylist(QTreeWidgetItem *item)
+bool	MainWindow::addToPlaylist(QTreeWidgetItem *item)
 {
   QListWidgetItem* newItem = new Media(static_cast<Media&>(*item));
   QString pathAss = changeExtansion(static_cast<Media*>(item)->getPath(), "ass");
   if (access(pathAss.toLocal8Bit().constData(), 0))
     {
-      std::cout << "cant find " << pathAss.toLocal8Bit().constData() << std::endl;
+      //std::cout << "cant find " << pathAss.toLocal8Bit().constData() << std::endl;
       if (!access(changeExtansion(static_cast<Media*>(item)->getPath(), "frm").toLocal8Bit().constData(), 0))
 	genereASS(*static_cast<Media*>(item));
       // try use OcamlScript
@@ -388,6 +399,7 @@ void	MainWindow::addToPlaylist(QTreeWidgetItem *item)
       _karaList.addItem(newItem);
       _playlistDuration += static_cast<Media*>(item)->getDuration();
       _lengthTime.setText("duration: " + durationToString(_playlistDuration));
+      return (true);
     }
   else
     {
@@ -396,9 +408,11 @@ void	MainWindow::addToPlaylist(QTreeWidgetItem *item)
 	  _karaList.addItem(newItem);
 	  _playlistDuration += static_cast<Media*>(item)->getDuration();
 	  _lengthTime.setText("duration: " + durationToString(_playlistDuration));
+	  return (true);
 	}
       else
 	delete newItem;
+      return (false);
     }
 }
 
@@ -464,9 +478,15 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
 
 void  MainWindow::changePlayer(int i)
 {
+  _playerOpt = "";
   if (i == MPLAYER)
     {
-      _playerOpt = " -fs -ass -framedrop -autosync 30 -mc 2.0 ";
+      if (_noFullScreen->isChecked() == false)
+      	{
+      	  _playerOpt = " -fs";
+      	}
+      _playerOpt += " -ass ";
+      //_playerOpt += " -ass -framedrop -autosync 30 -mc 2.0 ";
       _player = getPlayerCmd();
     }
   else if (i == MPV)
@@ -476,7 +496,8 @@ void  MainWindow::changePlayer(int i)
     }
   else
     {
-      _playerOpt = " -f";
+      if (_noFullScreen->isChecked() == false)
+      	_playerOpt = " -f ";
       _player = getPlayerCmd<VLC>();      
     }
 }
@@ -508,7 +529,7 @@ void MainWindow::start(void)
 	  listsKara += "\"";
           listsKara += _eyecatchDirectory;
           listsKara += SLASH;
-          listsKara += _eyecatchList[rand() % len];
+          listsKara += _eyecatchList[pRand() % len];
           listsKara += "\"";
           listsKara += _playerOpt;
         }
@@ -518,7 +539,7 @@ void MainWindow::start(void)
           endlist += "\"";
           endlist += _eyecatchDirectory.replace('/', SLASH);
           endlist += SLASH;
-          endlist += _eyecatchList[rand() % len];
+          endlist += _eyecatchList[pRand() % len];
           endlist += "\"";
           endlist += _playerOpt;
         }
@@ -549,8 +570,8 @@ void MainWindow::shufle(void)
 
   while (i < (len * 2))
     {
-      tmp = _karaList.takeItem(rand() % len);
-      _karaList.insertItem(rand() % (len - 1), tmp);
+      tmp = _karaList.takeItem(pRand() % len);
+      _karaList.insertItem(pRand() % (len - 1), tmp);
       ++i;
     }
 }
@@ -558,10 +579,10 @@ void MainWindow::shufle(void)
 void MainWindow::pick(void)
 {
   int	len = _FilesList.topLevelItemCount();
-  if (!len)
+  int	karaListLen = _karaList.count();
+  if ((len - karaListLen) <= 0)
     return;
-  addToPlaylist(static_cast<Media *>(_FilesList.topLevelItem(rand() % len)));
-
+  while (!addToPlaylist(static_cast<Media *>(_FilesList.topLevelItem(pRand() % len))));
 }
 
 void MainWindow::clearPlaylist(void)

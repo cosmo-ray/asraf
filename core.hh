@@ -26,6 +26,7 @@ QString  getPlayerCmd<VLC>();
 template<>
 QString  getPlayerCmd<MPV>();
 
+long int pRand();
 void	 initRand();
 
 const	QString durationToString(int64_t duration);
@@ -37,5 +38,7 @@ void	execPlaylist(const QString &player, const QString &listKara);
 bool    isAlphaNum(QCharRef c);
 
 QString changeExtansion(const QString &path, const char *ext);
+void	goToCurrentDirectory();
+QString getResourcesLocation();
 
 #endif

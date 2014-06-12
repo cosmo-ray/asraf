@@ -71,6 +71,7 @@ private:
   QAction     *_beginEyecatch;
   QAction     *_endEyecatch;
   QAction     *_noDouble;
+  QAction     *_noFullScreen;
   DecoderThread     _decoderThread;
 
   enum Conf
@@ -104,7 +105,7 @@ private slots:
   void genereASS(const Media &media) const;
 
   /*Files list slots*/
-  void addToPlaylist(QTreeWidgetItem *);
+  bool addToPlaylist(QTreeWidgetItem *);
   
   /*Kara list slots*/
   void rmItemFromKaraList(QListWidgetItem *);
