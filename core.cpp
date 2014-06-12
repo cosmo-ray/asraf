@@ -25,6 +25,19 @@ QString  getPlayerCmd<MPLAYER>()
 #endif
 }
 
+template	<>
+QString  getPlayerCmd<MPV>()
+{
+#ifdef	Q_OS_WIN32
+  QString ret = QDir::currentPath();
+
+  ret += "/mpv";
+  return (ret);
+#else
+  return ("mpv");
+#endif
+}
+
 void	initRand()
 {
 #ifdef	Q_OS_WIN32

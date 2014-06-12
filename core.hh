@@ -15,12 +15,16 @@
 
 #define	VLC	0
 #define	MPLAYER	1
+#define	MPV	2
 
 template<int i = MPLAYER>
 QString  getPlayerCmd();
 
 template<>
 QString  getPlayerCmd<VLC>();
+
+template<>
+QString  getPlayerCmd<MPV>();
 
 void	 initRand();
 

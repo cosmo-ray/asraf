@@ -84,9 +84,11 @@ MainWindow::MainWindow() : _vbox(this),
   _changePlayerLocation = _PlayerMenu.addAction("select player location");
   _selectMplayer = _PlayerMenu.addAction("select Mplayer as Player");
   _selectVLC = _PlayerMenu.addAction("select VLC as Player");
+  _selectMPV = _PlayerMenu.addAction("select MPV as Player");
   _selectMplayer->setCheckable(true);
   _selectMplayer->setChecked(true);
   _selectVLC->setCheckable(true);
+  _selectMPV->setCheckable(true);
 
   _beginEyecatch = _eyecatchMenu.addAction("begin eyecatch");
   _beginEyecatch->setCheckable(true);
@@ -131,6 +133,7 @@ void	MainWindow::connector(void)
   connect(_changePlayerLocation, SIGNAL(triggered()), this, SLOT(changePlayerLocation(void)));
   connect(_selectMplayer, SIGNAL(triggered()), this, SLOT(selectMplayer(void)));
   connect(_selectVLC, SIGNAL(triggered()), this, SLOT(selectVLC(void)));
+  connect(_selectMPV, SIGNAL(triggered()), this, SLOT(selectMPV(void)));
 
   connect(_beginEyecatch, SIGNAL(triggered()), this, SLOT(beginEyecatch(void)));
   connect(_endEyecatch, SIGNAL(triggered()), this, SLOT(endEyecatch(void)));
@@ -319,6 +322,8 @@ void	MainWindow::loadConfig()
       case SELECTED_PLAYER:
 	if (right == "vlc")
 	  changePlayer(VLC);
+	else if (right == "mpv")
+	  changePlayer(MPV);
 	else
 	  changePlayer(MPLAYER);
 	break;
@@ -463,6 +468,11 @@ void  MainWindow::changePlayer(int i)
     {
       _playerOpt = " -fs -ass -framedrop -autosync 30 -mc 2.0 ";
       _player = getPlayerCmd();
+    }
+  else if (i == MPV)
+    {
+      _playerOpt = " -fs -ass ";
+      _player = getPlayerCmd<MPV>();
     }
   else
     {
@@ -615,9 +625,18 @@ void MainWindow::ctrlgedited(void)
   }
 }
 
+void MainWindow::selectMPV(void)
+{
+  _selectMplayer->setChecked(false);
+  _selectMPV->setChecked(true);
+  _selectVLC->setChecked(false);
+  changePlayer(MPV);
+}
+
 void MainWindow::selectVLC(void)
 {
   _selectMplayer->setChecked(false);
+  _selectMPV->setChecked(false);
   _selectVLC->setChecked(true);
   changePlayer(VLC);
 }
@@ -625,6 +644,7 @@ void MainWindow::selectVLC(void)
 void MainWindow::selectMplayer(void)
 {
   _selectMplayer->setChecked(true);
+  _selectMPV->setChecked(false);
   _selectVLC->setChecked(false);
   changePlayer(MPLAYER);
 }

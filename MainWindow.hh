@@ -67,6 +67,7 @@ private:
   QAction     *_changePlayerLocation;
   QAction     *_selectMplayer;
   QAction     *_selectVLC;
+  QAction     *_selectMPV;
   QAction     *_beginEyecatch;
   QAction     *_endEyecatch;
   QAction     *_noDouble;
@@ -120,6 +121,7 @@ private slots:
   void changePlayerLocation(void);
   void selectVLC(void);
   void selectMplayer(void);
+  void selectMPV(void);
   void	savePlaylist(void);
   void	loadPlaylist(void);
   
