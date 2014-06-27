@@ -279,6 +279,7 @@ bool	MainWindow::isVideo(const QString &str)
 	  || str.contains(".mkv")
 	  || str.contains(".flv")
 	  || str.contains(".mp4")
+	  || str.contains(".webm")
 	  || str.contains(".ogv"));
 }
 
