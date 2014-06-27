@@ -492,7 +492,7 @@ void  MainWindow::changePlayer(int i)
     }
   else if (i == MPV)
     {
-      _playerOpt = " -fs -ass ";
+      _playerOpt = " -fs --sub-ass ";
       _player = getPlayerCmd<MPV>();
     }
   else
